@@ -2,7 +2,7 @@ import { DarkMode, LightMode } from "@mui/icons-material";
 import { Box, IconButton, useTheme } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { setMode } from "state";
-import logo from "../../components/LOGO.svg";
+import logo from "../../assets/LOGO.svg";
 import FlexBetween from "components/FlexBetween";
 import { useNavigate } from "react-router-dom";
 
