@@ -1,9 +1,7 @@
-import { useState } from "react";
 import {
   Box,
   Button,
   TextField,
-  useMediaQuery,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -12,13 +10,13 @@ import { Formik } from "formik";
 import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import FlexBetween from "components/FlexBetween";
 import { setLocations } from "state";
+import { useState } from "react";
 
 const formSchema = yup.object().shape({
   name: yup.string().required("required"),
   address: yup.string().required("required"),
-  phoneNumber: yup.number().required("required"),
+  phoneNumber: yup.number("Enter a number!").required("required"),
 });
 
 const initialValues = {
@@ -28,24 +26,34 @@ const initialValues = {
 };
 
 const CreateLocationForm = () => {
+  const [error, setError] = useState("");
   const { palette } = useTheme();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const newLocation = async (values, onSubmitProps) => {
+    try {
+      const locationRes = await fetch("/api/location/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+      const locations = await locationRes.json();
+   
+   
+      if (!locationRes.ok) {
+        // setError("Error");
+          throw new Error('Location already exists!');
+        }
 
-    const locationRes = await fetch("/api/location/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body:JSON.stringify(values)
-    });
-    const location = await locationRes.json();
-    console.log(location)
-    onSubmitProps.resetForm();
-
-    if (location) {
-      dispatch(setLocations(location));
-      navigate("/");
+      if (locationRes.ok) {
+        dispatch(setLocations(locations));
+        navigate("/");
+        onSubmitProps.resetForm();
+      }
+    } catch (err) {
+      setError(err.message);
+      console.log(err);
     }
   };
 
@@ -102,9 +110,12 @@ const CreateLocationForm = () => {
               onChange={handleChange}
               value={values.phoneNumber}
               name="phoneNumber"
-              error={Boolean(touched.phoneNumber) && Boolean(errors.phoneNumber)}
+              error={
+                Boolean(touched.phoneNumber) && Boolean(errors.phoneNumber)
+              }
               helperText={touched.phoneNumber && errors.phoneNumber}
             />
+            {error&&<Box><Typography variant="body1" color="red">{error}</Typography></Box>}
             <Button
               fullWidth
               type="submit"

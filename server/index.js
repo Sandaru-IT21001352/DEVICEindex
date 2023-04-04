@@ -44,10 +44,9 @@ const upload = multer({ storage: storage });
 
 /* Routes with files */
 // POST /api/:LocationID/device
-app.post("/api/device/:locationId", upload.single("picture"), createDevice);
+app.post("/api/device/:locationId", upload.single("imageURL"), createDevice);
 
 /* Routes without files */
-
 app.use("/api/location", locationRoutes);
 
 app.use("/api/device", deviceRoutes);

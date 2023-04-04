@@ -19,6 +19,7 @@ import CreateLocationForm from "components/CreateLocationForm";
 import FlexBetween from "components/FlexBetween";
 import LocationRow from "components/LocationRow";
 import WidgetWrapper from "components/WidgetWrapper";
+import AddIcon from '@mui/icons-material/Add';
 
 const LocationCatalog = () => {
   const dispatch = useDispatch();
@@ -26,9 +27,13 @@ const LocationCatalog = () => {
   const locations = useSelector((state) => state.locations);
 
   const getLocations = async () => {
-    const response = await fetch("/api/location/");
-    const data = await response.json();
-    dispatch(setLocations({ locations: data }));
+    try {
+      const response = await fetch("/api/location/");
+      const data = await response.json();
+      dispatch(setLocations({ locations: data }));
+    } catch (err) {
+      console.log(err);
+    }
   };
   useEffect(() => {
     getLocations();
@@ -49,37 +54,21 @@ const LocationCatalog = () => {
           fullWidth
           sx={{
             m: "0.75rem 0",
-            p: "1rem",
+            p: "0.5rem",
             backgroundColor: palette.primary.main,
             color: palette.background.alt,
             "&:hover": { color: palette.primary.main },
           }}
+          endIcon={<AddIcon />}
           onClick={handleClickOpen}
         >
           Add Location
         </Button>
-        {locations&&locations.map((location) => (
-          <LocationRow key={location.id} {...location} />
-        ))}
+        {locations &&
+          locations.map((location) => (
+            <LocationRow key={location.id} {...location} />
+          ))}
       </FlexBetween>
-      {/* <Dialog open={open} onClose={handleClose}>
-        <DialogTitle >
-        Subscribe
-          <IconButton
-            aria-label="close"
-            onClick={handleClose}
-            sx={{
-              position: "absolute",
-              right: 8,
-              top: 8,
-              color: (theme) => theme.palette.grey[500],
-            }}
-          >
-            
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-      </Dialog> */}
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>
           Add new Location
@@ -98,20 +87,7 @@ const LocationCatalog = () => {
         </DialogTitle>
         <DialogContent>
           <CreateLocationForm />
-          <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            label="Email Address"
-            type="email"
-            fullWidth
-            variant="standard"
-          />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleClose}>Subscribe</Button>
-        </DialogActions>
       </Dialog>
     </WidgetWrapper>
   );

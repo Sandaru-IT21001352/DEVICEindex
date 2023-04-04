@@ -11,14 +11,16 @@ export const createDevice = async (req, res) => {
 
     const location = await Location.findById(req.params.locationId);
     if (!location) throw new Error("Location not found!");
-
-    const newDevice = new Device({ serialNumber, type, imageURL, status });
+    const isStatus = status == "active" ? true : false;
+    const newDevice = new Device({ serialNumber, type, imageURL, status:isStatus });
     await newDevice.save();
 
     location.devices.push(newDevice);
     await location.save();
+    const newLocation = await Location.findById(req.params.locationId).populate("devices");
+    // const updatedLocations = await Location.find().populate("devices");
 
-    res.status(201).json(location);
+    res.status(201).json(newLocation);
   } catch (err) {
     res.status(409).json({ message: err.message });
   }
@@ -67,9 +69,13 @@ export const updateDevice = async (req, res) => {
     const location = await Location.findById(locationId);
     if (!location) throw new Error("Location not found!");
 
-    const updatedDevice = await Device.findByIdAndUpdate({_id:deviceId}, req.body, {
-      new: true,
-    });
+    const updatedDevice = await Device.findByIdAndUpdate(
+      { _id: deviceId },
+      req.body,
+      {
+        new: true,
+      }
+    );
 
     res.status(201).json(updatedDevice);
   } catch (err) {

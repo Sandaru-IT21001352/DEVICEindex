@@ -9,7 +9,7 @@ const DeviceSchema = new mongoose.Schema({
     type:String,
     required: true,
   },imageURL: {
-    type:Number,
+    type:String,
     required: true,
   },status: {
     type: Boolean,
